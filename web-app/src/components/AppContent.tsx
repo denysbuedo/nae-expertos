@@ -27,15 +27,12 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
               <Image
                 src="/logo.png"
                 alt="Logo NAE"
-                width={180}
-                height={60}
+                width={220}
+                height={70}
                 className="object-contain"
               />
               <div>
-                <h1 className="text-2xl font-bold text-white">
-                  Proyecto NAE
-                </h1>
-                <p className="text-sm text-slate-300">
+                <p className="text-lg font-medium text-white">
                   Gestión de Expertos
                 </p>
               </div>

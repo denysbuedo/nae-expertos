@@ -1,0 +1,215 @@
+// This is your Prisma schema file for the NAE Experts Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Orden de Pedido (Work Order)
+model Order {
+  id          String   @id @default(uuid())
+  number      String   @unique /// Order number/identifier
+  title       String
+  description String?  @db.Text
+  status      OrderStatus @default(ACTIVE)
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  activities  Activity[]
+
+  @@map("orders")
+}
+
+/// Actividad (Activity)
+model Activity {
+  id          String   @id @default(uuid())
+  orderId     String
+  number      String   /// Activity number within the order
+  title       String
+  description String?  @db.Text
+  status      ActivityStatus @default(PLANNED)
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  subactivities SubActivity[]
+
+  @@map("activities")
+}
+
+/// Subactividad (Sub-Activity)
+model SubActivity {
+  id          String   @id @default(uuid())
+  activityId  String
+  number      String   /// Sub-activity number within the activity
+  title       String
+  description String?  @db.Text
+  status      SubActivityStatus @default(PLANNED)
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  deliverables Deliverable[]
+  assignments  Assignment[]
+
+  @@map("subactivities")
+}
+
+/// Entregable (Deliverable)
+model Deliverable {
+  id              String   @id @default(uuid())
+  subActivityId   String
+  title           String
+  description     String?  @db.Text
+  status          DeliverableStatus @default(PENDING)
+  dueDate         DateTime?
+  deliveryDate    DateTime?
+  fileUrl         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subActivity     SubActivity @relation(fields: [subActivityId], references: [id], onDelete: Cascade)
+  assignments     DeliverableAssignment[]
+
+  @@map("deliverables")
+}
+
+/// Perfil (Role/Type of expert)
+model Profile {
+  id          String   @id @default(uuid())
+  name        String   /// Nombre del perfil (rol)
+  description String?  @db.Text /// Descripción del perfil
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  expertPoolProfiles ExpertPoolProfile[]
+
+  @@map("profiles")
+}
+
+/// Bolsa de Expertos (Expert Pool)
+model ExpertPool {
+  id          String   @id @default(uuid())
+  firstName   String   /// Nombre
+  lastName    String   /// Apellido
+  email       String   @unique /// Correo electrónico
+  institution String   /// Institución
+  notes       String?  @db.Text /// Notas adicionales
+  active      Boolean  @default(true) /// Si está disponible en la bolsa
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  profiles    ExpertPoolProfile[]
+  assignments Assignment[]
+  deliverableAssignments DeliverableAssignment[]
+
+  @@map("expert_pool")
+}
+
+/// Relación muchos-a-muchos entre ExpertPool y Profile
+model ExpertPoolProfile {
+  id          String   @id @default(uuid())
+  expertId    String
+  profileId   String
+  createdAt   DateTime @default(now())
+
+  expert      ExpertPool @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([expertId, profileId])
+  @@map("expert_pool_profiles")
+}
+
+/// Asignación - Relación muchos a muchos entre ExpertPool y Subactividades
+model Assignment {
+  id              String   @id @default(uuid())
+  expertPoolId    String
+  subActivityId   String
+  role            String?  /// Role in this sub-activity
+  assignedAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  expert          ExpertPool @relation(fields: [expertPoolId], references: [id], onDelete: Cascade)
+  subActivity     SubActivity @relation(fields: [subActivityId], references: [id], onDelete: Cascade)
+
+  @@unique([expertPoolId, subActivityId])
+  @@map("assignments")
+}
+
+/// Asignación de personas a Entregables
+model DeliverableAssignment {
+  id           String   @id @default(uuid())
+  expertId     String
+  deliverableId String
+  isResponsible Boolean @default(false) /// True = responsable principal
+  role         String?  /// Rol en este entregable
+  assignedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  expert      ExpertPool @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  deliverable Deliverable @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+
+  @@unique([expertId, deliverableId])
+  @@map("deliverable_assignments")
+}
+
+/// Enums
+
+enum UserRole {
+  ADMIN
+  USER
+  VIEWER
+}
+
+/// Usuario del sistema (Authentication)
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String   /// Hashed with bcrypt
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum OrderStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  SUSPENDED
+}
+
+enum ActivityStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SubActivityStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliverableStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+}

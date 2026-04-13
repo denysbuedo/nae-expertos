@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de Desarrollo con Agentes AI - Documentación Completa</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--gray-50);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: white;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav a {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        nav a:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            background: white;
+            margin: 2rem 0;
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        h3 {
+            color: var(--gray-800);
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            color: var(--gray-700);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        tr:hover {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .agent-card {
+            background: var(--gray-50);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.5rem;
+        }
+
+        .agent-card h4 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .code-block {
+            background: var(--gray-900);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .highlight {
+            background: #fef08a;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .escalation-flow {
+            background: var(--gray-50);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .escalation-step {
+            background: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        footer {
+            background: var(--gray-900);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .toc {
+            background: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .toc ol {
+            margin-left: 1.5rem;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 1.5rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🤖 Modelo de Desarrollo con Agentes AI</h1>
+        <p>Modelo formal de desarrollo de software para equipos pequeños (3-5 personas)</p>
+        <p>Versión 1.0.0 | Abril 2026</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#introduccion">Introducción</a></li>
+            <li><a href="#roles">Roles y Agentes</a></li>
+            <li><a href="#arquitectura">Arquitectura</a></li>
+            <li><a href="#templates">Templates</a></li>
+            <li><a href="#testing">Testing</a></li>
+            <li><a href="#deploy">Deploy</a></li>
+            <li><a href="#escalamiento">Escalamiento</a></li>
+            <li><a href="#soporte">Soporte</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <section id="introduccion">
+            <h2>📋 Introducción</h2>
+            
+            <p>Este documento presenta el <strong>Modelo de Desarrollo de Software con Agentes AI</strong>, un framework completo diseñado para equipos pequeños de 3-5 personas que trabajan en proyectos de Web Apps, APIs/Backend y Data/Analytics.</p>
+
+            <h3>¿Qué es este Modelo?</h3>
+            <p>Es un sistema híbrido que combina <strong>developers humanos</strong> con <strong>agentes de Inteligencia Artificial</strong> para maximizar la productividad manteniendo la calidad del código y la seguridad.</p>
+
+            <h3>Características Principales</h3>
+            <ul>
+                <li><strong>8 agentes AI especializados</strong>: 4 de desarrollo + 4 de soporte</li>
+                <li><strong>Stack estandarizado</strong>: React/Next.js, Node.js, Python, PostgreSQL</li>
+                <li><strong>Templates listos para usar</strong>: Web App, API Backend, Data Analytics</li>
+                <li><strong>Protocolos de testing</strong>: Cobertura 80%+, pirámide 70/20/10</li>
+                <li><strong>CI/CD automatizado</strong>: GitHub Actions, Docker, deploy en 3 environments</li>
+                <li><strong>Reglas de escalamiento claras</strong>: Cuándo el agente trabaja solo vs. cuándo necesita supervisión</li>
+            </ul>
+
+            <h3>Tipos de Proyectos Soportados</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>🌐 Web Apps</h4>
+                    <p>Aplicaciones web full-stack con Next.js, React, TypeScript y TailwindCSS</p>
+                </div>
+                <div class="card">
+                    <h4>⚙️ APIs/Backend</h4>
+                    <p>Servicios RESTful, microservicios con Node.js/Express y Python/FastAPI</p>
+                </div>
+                <div class="card">
+                    <h4>📊 Data/Analytics</h4>
+                    <p>Pipelines ETL, análisis de datos, visualización y reportes automatizados</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="roles">
+            <h2>👥 Roles y Agentes</h2>
+
+            <h3>Estructura del Equipo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>Responsable</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Arquitecto/Lead Dev</strong></td>
+                        <td>Humano</td>
+                        <td>Diseño de arquitectura, decisiones técnicas, code review</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Full-Stack Developer</strong></td>
+                        <td>Humano + AI</td>
+                        <td>Desarrollo frontend y backend</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data/Backend Developer</strong></td>
+                        <td>Humano + AI</td>
+                        <td>APIs, servicios, análisis de datos, BD</td>
+                    </tr>
+                    <tr>
+                        <td><strong>QA Engineer</strong></td>
+                        <td>AI</td>
+                        <td>Pruebas automatizadas, validación, reporting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DevOps Engineer</strong></td>
+                        <td>AI</td>
+                        <td>CI/CD, infraestructura, despliegue, monitoreo</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Agentes de Desarrollo</h3>
+
+            <div class="agent-card">
+                <h4>🎨 frontend-dev</h4>
+                <p><strong>Especialidad:</strong> React, Next.js, TypeScript, TailwindCSS</p>
+                <p><strong>Capacidades:</strong></p>
+                <ul>
+                    <li>Crear componentes React reutilizables</li>
+                    <li>Implementar páginas completas con Next.js App Router</li>
+                    <li>Integrar APIs del backend</li>
+                    <li>Manejar estado con Zustand/Redux</li>
+                    <li>Responsive design y accesibilidad</li>
+                </ul>
+                <p><strong>Autonomía:</strong> <span class="badge badge-success">✅ Componentes UI</span> <span class="badge badge-warning">⚠️ Lógica compleja</span></p>
+            </div>
+
+            <div class="agent-card">
+                <h4>⚙️ backend-dev</h4>
+                <p><strong>Especialidad:</strong> APIs REST, Node.js/Express, PostgreSQL, Autenticación</p>
+                <p><strong>Capacidades:</strong></p>
+                <ul>
+                    <li>Crear endpoints RESTful con Express/FastAPI</li>
+                    <li>Implementar autenticación JWT/OAuth</li>
+                    <li>Diseñar esquemas de base de datos (Prisma/SQLAlchemy)</li>
+                    <li>Middleware de validación y error handling</li>
+                    <li>Integración con Redis para cache/queues</li>
+                </ul>
+                <p><strong>Autonomía:</strong> <span class="badge badge-success">✅ CRUD endpoints</span> <span class="badge badge-warning">⚠️ Microservicios</span></p>
+            </div>
+
+            <div class="agent-card">
+                <h4>📊 data-engineer</h4>
+                <p><strong>Especialidad:</strong> ETL pipelines, Pandas, Visualización, Reportes</p>
+                <p><strong>Capacidades:</strong></p>
+                <ul>
+                    <li>Extraer datos de APIs, BDs, archivos</li>
+                    <li>Transformar y limpiar datos con Pandas</li>
+                    <li>Crear visualizaciones (matplotlib, plotly)</li>
+                    <li>Generar reportes automatizados</li>
+                    <li>Análisis estadístico</li>
+                </ul>
+                <p><strong>Autonomía:</strong> <span class="badge badge-success">✅ Análisis exploratorio</span> <span class="badge badge-warning">⚠️ Modelos predictivos</span></p>
+            </div>
+
+            <div class="agent-card">
+                <h4>🚀 fullstack-dev</h4>
+                <p><strong>Especialidad:</strong> Desarrollo end-to-end, features completas, MVPs</p>
+                <p><strong>Capacidades:</strong></p>
+                <ul>
+                    <li>Desarrollar features completas (UI + API + BD)</li>
+                    <li>Integración entre capas</li>
+                    <li>Refactorización cross-layer</li>
+                    <li>Prototipado rápido de MVPs</li>
+                </ul>
+                <p><strong>Autonomía:</strong> <span class="badge badge-success">✅ Features CRUD</span> <span class="badge badge-warning">⚠️ Sistemas distribuidos</span></p>
+            </div>
+
+            <h3>🔧 Agentes de Soporte</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agente</th>
+                        <th>Uso</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>general-purpose</code></td>
+                        <td>Investigación, búsqueda de código</td>
+                        <td>"Busca implementaciones de auth"</td>
+                    </tr>
+                    <tr>
+                        <td><code>devops-deployment-expert</code></td>
+                        <td>Infraestructura, CI/CD, servidores</td>
+                        <td>"Configura pipeline de GitHub Actions"</td>
+                    </tr>
+                    <tr>
+                        <td><code>analista-datos-encuestas</code></td>
+                        <td>Análisis de encuestas, estadísticas</td>
+                        <td>"Analiza satisfacción del cliente"</td>
+                    </tr>
+                    <tr>
+                        <td><code>Explore</code></td>
+                        <td>Exploración rápida de codebase</td>
+                        <td>"Encuentra componentes React"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Skills Especiales</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Skill</th>
+                        <th>Comando</th>
+                        <th>Uso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>loop</strong></td>
+                        <td><code>/loop 5m check the build</code></td>
+                        <td>Tareas recurrentes programadas</td>
+                    </tr>
+                    <tr>
+                        <td><strong>qc-helper</strong></td>
+                        <td><code>/qc-helper</code></td>
+                        <td>Ayuda sobre configuración de Qwen</td>
+                    </tr>
+                    <tr>
+                        <td><strong>review</strong></td>
+                        <td><code>/review</code></td>
+                        <td>Code review de cambios/PRs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="arquitectura">
+            <h2>🏗️ Arquitectura de Referencia</h2>
+
+            <h3>Stack de Desarrollo</h3>
+            
+            <h4>Frontend</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tecnología</th>
+                        <th>Versión</th>
+                        <th>Propósito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>React</td>
+                        <td>18+</td>
+                        <td>UI Library</td>
+                    </tr>
+                    <tr>
+                        <td>TypeScript</td>
+                        <td>5+</td>
+                        <td>Type Safety</td>
+                    </tr>
+                    <tr>
+                        <td>Next.js</td>
+                        <td>14+</td>
+                        <td>Framework (SSR/SSG)</td>
+                    </tr>
+                    <tr>
+                        <td>TailwindCSS</td>
+                        <td>3+</td>
+                        <td>Styling</td>
+                    </tr>
+                    <tr>
+                        <td>Zustand/Redux</td>
+                        <td>Latest</td>
+                        <td>State Management</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Backend</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tecnología</th>
+                        <th>Versión</th>
+                        <th>Propósito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node.js</td>
+                        <td>20+ LTS</td>
+                        <td>Runtime</td>
+                    </tr>
+                    <tr>
+                        <td>Express.js / FastAPI</td>
+                        <td>Latest</td>
+                        <td>API Framework</td>
+                    </tr>
+                    <tr>
+                        <td>Python</td>
+                        <td>3.11+</td>
+                        <td>Data/ML Services</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL</td>
+                        <td>15+</td>
+                        <td>Base de Datos Principal</td>
+                    </tr>
+                    <tr>
+                        <td>Redis</td>
+                        <td>7+</td>
+                        <td>Cache/Queue</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>DevOps & Testing</h4>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>DevOps</h4>
+                    <ul>
+                        <li><strong>Docker:</strong> Containerización</li>
+                        <li><strong>GitHub Actions:</strong> CI/CD</li>
+                        <li><strong>HAProxy/Nginx:</strong> Load Balancer</li>
+                        <li><strong>PM2:</strong> Process Manager</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Testing</h4>
+                    <ul>
+                        <li><strong>Jest:</strong> Unit Testing (JS/TS)</li>
+                        <li><strong>pytest:</strong> Unit Testing (Python)</li>
+                        <li><strong>Playwright:</strong> E2E Testing</li>
+                        <li><strong>Supertest:</strong> API Testing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Patrones Arquitectónicos</h3>
+            
+            <h4>Web Apps</h4>
+            <div class="code-block">
+┌─────────────────────────────────────────┐
+│           Next.js (Frontend)            │
+│   ┌──────────┬──────────┬──────────┐   │
+│   │  Pages   │ Components │ Hooks  │   │
+│   └──────────┴──────────┴──────────┘   │
+└──────────────┬──────────────────────────┘
+               │ API Routes
+┌──────────────▼──────────────────────────┐
+│         Backend Services                │
+│   ┌──────────┬──────────┬──────────┐   │
+│   │ Express  │ FastAPI  │  Auth    │   │
+│   └──────────┴──────────┴──────────┘   │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│         Data Layer                      │
+│   ┌──────────┬──────────┬──────────┐   │
+│   │PostgreSQL│  Redis   │  S3      │   │
+│   └──────────┴──────────┴──────────┘   │
+└─────────────────────────────────────────┘
+            </div>
+
+            <h4>APIs/Backend</h4>
+            <div class="code-block">
+┌─────────────────────────────────────────┐
+│           API Gateway                   │
+│         (Nginx/HAProxy)                 │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│         Microservicios                  │
+│   ┌──────────┬──────────┬──────────┐   │
+│   │  Users   │  Orders  │ Analytics│   │
+│   └──────────┴──────────┴──────────┘   │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│   Message Queue (Redis/RabbitMQ)        │
+└─────────────────────────────────────────┘
+            </div>
+        </section>
+
+        <section id="templates">
+            <h2>📁 Plantillas de Proyectos</h2>
+
+            <p>El modelo incluye <strong>3 templates completos y listos para usar</strong> con código real, configuración y estructura de archivos definida.</p>
+
+            <h3>1. Web App (Next.js + TypeScript)</h3>
+            <div class="card">
+                <h4>Estructura</h4>
+                <div class="code-block">
+web-app/
+├── src/
+│   ├── app/              # Next.js App Router
+│   │   ├── layout.tsx    # Root layout
+│   │   └── page.tsx      # Home page
+│   ├── components/
+│   │   └── ui/           # Reusable UI components
+│   │       ├── Button.tsx
+│   │       └── Card.tsx
+│   ├── lib/              # Utilities
+│   │   ├── api.ts        # API client
+│   │   └── utils.ts      # Helper functions
+│   └── stores/           # Zustand stores
+│       └── authStore.ts
+├── .env.example
+├── next.config.js
+├── tailwind.config.js
+└── package.json
+                </div>
+                <h4>Scripts Disponibles</h4>
+                <ul>
+                    <li><code>npm run dev</code> - Desarrollo</li>
+                    <li><code>npm run build</code> - Build producción</li>
+                    <li><code>npm test</code> - Tests unitarios</li>
+                    <li><code>npm run test:e2e</code> - Tests E2E</li>
+                </ul>
+            </div>
+
+            <h3>2. API Backend (Node.js + Express)</h3>
+            <div class="card">
+                <h4>Estructura</h4>
+                <div class="code-block">
+api-backend/
+├── src/
+│   ├── index.ts          # Entry point
+│   ├── routes/
+│   │   └── users.ts      # User CRUD endpoints
+│   └── lib/
+│       └── database.ts   # Prisma client
+├── prisma/
+│   └── schema.prisma     # Database schema
+├── .env.example
+├── tsconfig.json
+└── package.json
+                </div>
+                <h4>Características</h4>
+                <ul>
+                    <li>CRUD completo con validación Zod</li>
+                    <li>Seguridad con Helmet + CORS</li>
+                    <li>Logging con Morgan</li>
+                    <li>Prisma ORM con PostgreSQL</li>
+                    <li>Rate limiting + compression</li>
+                </ul>
+            </div>
+
+            <h3>3. Data Analytics (Python)</h3>
+            <div class="card">
+                <h4>Estructura</h4>
+                <div class="code-block">
+data-analytics/
+├── src/
+│   ├── config.py           # Configuration
+│   ├── data/
+│   │   ├── extract.py      # Data extraction
+│   │   └── transform.py    # Data transformation
+│   └── analysis/
+│       └── example_analysis.py
+├── data/
+│   ├── raw/               # Raw data
+│   ├── processed/         # Cleaned data
+│   └── output/            # Results
+├── notebooks/
+├── requirements.txt
+└── README.md
+                </div>
+                <h4>Características</h4>
+                <ul>
+                    <li>Extractores para APIs, BDs, archivos</li>
+                    <li>Transformaciones con Pandas</li>
+                    <li>Visualizaciones con Matplotlib/Seaborn</li>
+                    <li>Notebooks Jupyter listos</li>
+                </ul>
+            </div>
+
+            <h3>Cómo Usar los Templates</h3>
+            <div class="code-block">
+# 1. Copiar el template
+cp -r templates/web-app ../mi-proyecto
+cd ../mi-proyecto
+
+# 2. Instalar dependencias
+npm install  # o pip install -r requirements.txt
+
+# 3. Configurar variables de entorno
+cp .env.example .env
+
+# 4. Iniciar desarrollo
+npm run dev
+            </div>
+        </section>
+
+        <section id="testing">
+            <h2>🧪 Protocolos de Pruebas</h2>
+
+            <h3>Pirámide de Testing</h3>
+            <div class="code-block">
+           /\
+          /  \
+         / E2E \        → Playwright (10%)
+        /______\
+       /        \
+      / Integration\   → Supertest/pytest (20%)
+     /______________\
+    /                \
+   /    Unit Tests    \ → Jest/pytest (70%)
+  /____________________\
+            </div>
+
+            <h3>Cobertura Mínima Requerida</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Cobertura Mínima</th>
+                        <th>Herramienta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Unitarios</td>
+                        <td><strong>80%+</strong></td>
+                        <td>Jest / pytest</td>
+                    </tr>
+                    <tr>
+                        <td>Integración</td>
+                        <td><strong>70%+</strong></td>
+                        <td>Supertest / requests</td>
+                    </tr>
+                    <tr>
+                        <td>E2E</td>
+                        <td><strong>Flujos críticos</strong></td>
+                        <td>Playwright</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Workflow de Testing</h3>
+            <div class="code-block">
+Commit → Lint → Unit Tests → Integration Tests → Build
+                                              ↓
+                                    Coverage >= 80%?
+                                              ↓
+                                    Yes → Deploy Staging
+                                    No  → Reject
+            </div>
+
+            <h3>Comandos Estándar</h3>
+            <div class="code-block">
+# Unit tests
+npm run test
+npm run test:coverage
+
+# Integration tests
+npm run test:integration
+
+# E2E tests
+npm run test:e2e
+
+# All tests
+npm run test:all
+            </div>
+        </section>
+
+        <section id="deploy">
+            <h2>🚀 Protocolos de Despliegue</h2>
+
+            <h3>Environments</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Environment</th>
+                        <th>Propósito</th>
+                        <th>URL</th>
+                        <th>Auto-Deploy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Development</strong></td>
+                        <td>Desarrollo local</td>
+                        <td>localhost</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Staging</strong></td>
+                        <td>Testing/QA</td>
+                        <td>staging.domain.com</td>
+                        <td>Push a <code>develop</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Production</strong></td>
+                        <td>Usuarios finales</td>
+                        <td>domain.com</td>
+                        <td>Merge a <code>main</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>CI/CD Pipeline</h3>
+            <div class="code-block">
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:coverage
+      - run: npm run build
+
+  deploy-staging:
+    needs: test
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying to staging..."
+
+  deploy-production:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying to production..."
+            </div>
+
+            <h3>Estrategias de Deploy</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estrategia</th>
+                        <th>Uso</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Rolling</strong></td>
+                        <td>Producción</td>
+                        <td>Actualización gradual de instancias</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Blue-Green</strong></td>
+                        <td>Crítico</td>
+                        <td>Dos ambientes idénticos, switch instantáneo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Canary</strong></td>
+                        <td>Features nuevos</td>
+                        <td>10% tráfico → 50% → 100%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Rollback Automático</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>Trigger:</strong> Error rate > 5% en 5 minutos</li>
+                    <li><strong>Acción:</strong> Revert al último deploy exitoso</li>
+                    <li><strong>Notificación:</strong> Slack/Email al equipo</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="escalamiento">
+            <h2>⚖️ Reglas de Escalamiento</h2>
+
+            <p>Los agentes trabajan de forma <strong>autónoma (✅)</strong> por defecto, pero deben escalar a <strong>asistido (⚠️)</strong> bajo ciertas condiciones.</p>
+
+            <h3>🔴 Escalamiento Automático (Obligatorio)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Condición</th>
+                        <th>Ejemplo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Seguridad</strong></td>
+                        <td>Auth, JWT, OAuth</td>
+                        <td>Revisión humana obligatoria</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Datos sensibles</strong></td>
+                        <td>Queries a producción</td>
+                        <td>Aprobación del Arquitecto</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cambios breaking</strong></td>
+                        <td>API version changes</td>
+                        <td>Review + testing extra</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Producción</strong></td>
+                        <td>Deploy a prod</td>
+                        <td>Arquitecto debe aprobar</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Costos</strong></td>
+                        <td>Servicios cloud nuevos</td>
+                        <td>Evaluación de impacto</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🟡 Escalamiento Recomendado</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Condición</th>
+                        <th>Ejemplo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Complejidad alta</strong></td>
+                        <td>+500 líneas, +5 archivos</td>
+                        <td>Sugerir revisión</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance crítico</strong></td>
+                        <td>Queries complejos</td>
+                        <td>Benchmark requerido</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tecnología nueva</strong></td>
+                        <td>Librerías no usadas</td>
+                        <td>Documentar decisiones</td>
+                    </tr>
+                    <tr>
+                        <td><strong>UX crítico</strong></td>
+                        <td>Login, checkout</td>
+                        <td>QA manual recomendado</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🟢 Permanece Autónomo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Condición</th>
+                        <th>Ejemplo</th>
+                        <th>Proceso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CRUD estándar</strong></td>
+                        <td>Endpoints GET/POST</td>
+                        <td>Tests → merge</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Componentes UI</strong></td>
+                        <td>Botones, cards</td>
+                        <td>Linting + tests → merge</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bug fixes menores</strong></td>
+                        <td>Typos, estilos</td>
+                        <td>Auto-merge si tests OK</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Documentación</strong></td>
+                        <td>READMEs</td>
+                        <td>Merge directo</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Matriz de Decisión</h3>
+            <div class="escalation-flow">
+                <div class="escalation-step">
+                    <strong>1. ¿Datos de usuarios o seguridad?</strong><br>
+                    SÍ → 🔴 ESCALAR | NO → Continuar
+                </div>
+                <div class="escalation-step">
+                    <strong>2. ¿Afecta producción directamente?</strong><br>
+                    SÍ → 🔴 ESCALAR | NO → Continuar
+                </div>
+                <div class="escalation-step">
+                    <strong>3. ¿+500 líneas o +5 archivos?</strong><br>
+                    SÍ → 🟡 RECOMENDAR revisión | NO → Continuar
+                </div>
+                <div class="escalation-step">
+                    <strong>4. ¿Tecnología no probada?</strong><br>
+                    SÍ → 🟡 DOCUMENTAR | NO → Continuar
+                </div>
+                <div class="escalation-step">
+                    <strong>5. ¿CRUD/UI estándar?</strong><br>
+                    SÍ → ✅ AUTÓNOMO | NO → 🟡 EVALUAR
+                </div>
+            </div>
+
+            <h3>SLA de Respuesta</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prioridad</th>
+                        <th>Tipo</th>
+                        <th>Respuesta Máx</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-danger">P0</span></td>
+                        <td>Producción caída</td>
+                        <td>15 min</td>
+                        <td>Server down</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-danger">P1</span></td>
+                        <td>Security/Blocking</td>
+                        <td>1 hora</td>
+                        <td>Auth bug</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-warning">P2</span></td>
+                        <td>Feature compleja</td>
+                        <td>4 horas</td>
+                        <td>Sistema de pagos</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-success">P3</span></td>
+                        <td>Mejora/Refactor</td>
+                        <td>24 horas</td>
+                        <td>Optimización</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="soporte">
+            <h2>🛟 Esquemas de Soporte</h2>
+
+            <h3>Niveles de Soporte</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Descripción</th>
+                        <th>Responsable</th>
+                        <th>SLA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>L1</strong></td>
+                        <td>Issues básicos, FAQs</td>
+                        <td>Automated/Bot</td>
+                        <td>Inmediato</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L2</strong></td>
+                        <td>Bugs, configuración</td>
+                        <td>Developer</td>
+                        <td>4 horas</td>
+                    </tr>
+                    <tr>
+                        <td><strong>L3</strong></td>
+                        <td>Issues críticos</td>
+                        <td>Arquitecto</td>
+                        <td>1 hora</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Monitoreo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Herramienta</th>
+                        <th>Alerta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Uptime</td>
+                        <td>UptimeRobot</td>
+                        <td>< 99.9%</td>
+                    </tr>
+                    <tr>
+                        <td>Response Time</td>
+                        <td>New Relic/Datadog</td>
+                        <td>> 500ms</td>
+                    </tr>
+                    <tr>
+                        <td>Error Rate</td>
+                        <td>Sentry</td>
+                        <td>> 1%</td>
+                    </tr>
+                    <tr>
+                        <td>DB Performance</td>
+                        <td>pg_stat_statements</td>
+                        <td>Queries lentas</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Definition of Done (DoD)</h3>
+            <div class="card">
+                <ul>
+                    <li>☐ Código implementado</li>
+                    <li>☐ Tests unitarios passing (>80% coverage)</li>
+                    <li>☐ Tests de integración passing</li>
+                    <li>☐ Code review aprobado</li>
+                    <li>☐ Documentación actualizada</li>
+                    <li>☐ Deploy en staging exitoso</li>
+                    <li>☐ QA aprobado</li>
+                </ul>
+            </div>
+
+            <h3>Convenciones de Commits</h3>
+            <div class="code-block">
+feat(auth): add JWT validation
+fix(api): resolve null pointer in users endpoint
+docs(readme): update installation steps
+refactor(core): extract validation logic
+test(users): add unit tests for registration
+            </div>
+
+            <h3>Git Flow</h3>
+            <div class="code-block">
+main ──────────────────────────────────►
+        ↑ merge        ↑ merge
+develop ───────────────┼──────────────►
+        ↑ merge     ↑ merge
+feature/1 ──┘      │
+feature/2 ─────────┘
+            </div>
+        </section>
+
+        <section>
+            <h2>📚 Resumen Final</h2>
+            
+            <p>Este <strong>Modelo de Desarrollo con Agentes AI</strong> proporciona un framework completo y probado para equipos pequeños que buscan:</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>✅ Productividad</h4>
+                    <p>Agentes autónomos para tareas estándar, developers humanos para decisiones estratégicas</p>
+                </div>
+                <div class="card">
+                    <h4>✅ Calidad</h4>
+                    <p>Testing riguroso (80%+ coverage), code review obligatorio, reglas de escalamiento claras</p>
+                </div>
+                <div class="card">
+                    <h4>✅ Seguridad</h4>
+                    <p>Escalamiento automático para auth, datos sensibles y producción</p>
+                </div>
+                <div class="card">
+                    <h4>✅ Escalabilidad</h4>
+                    <p>Templates reutilizables, CI/CD automatizado, monitoreo proactivo</p>
+                </div>
+            </div>
+
+            <h3>Próximos Pasos</h3>
+            <ol>
+                <li><strong>Revisar el modelo</strong> completo en <code>MODELO-DESARROLLO.md</code></li>
+                <li><strong>Elegir un template</strong> y comenzar un nuevo proyecto</li>
+                <li><strong>Configurar CI/CD</strong> con GitHub Actions</li>
+                <li><strong>Definir agentes</strong> específicos para tu equipo</li>
+                <li><strong>Iterar y mejorar</strong> el modelo basado en experiencia</li>
+            </ol>
+        </section>
+    </div>
+
+    <footer>
+        <p><strong>Modelo de Desarrollo con Agentes AI v1.0.0</strong></p>
+        <p>Abril 2026 | Equipo de Desarrollo</p>
+        <p>Documento generado como parte del modelo formal de desarrollo</p>
+    </footer>
+</body>
+</html>

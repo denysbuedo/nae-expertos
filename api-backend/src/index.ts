@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 // Import routes
 import authRouter from './routes/auth';
+import usersRouter from './routes/users';
 import ordersRouter from './routes/orders';
 import activitiesRouter from './routes/activities';
 import subactivitiesRouter from './routes/subactivities';
@@ -15,7 +16,7 @@ import deliverableAssignmentsRouter from './routes/deliverableAssignments';
 import profilesRouter from './routes/profiles';
 import assignmentsRouter from './routes/assignments';
 import expertPoolRouter from './routes/expertPool';
-import { authenticateToken } from './middleware/auth';
+import { authenticateToken, requireWrite } from './middleware/auth';
 
 // Load environment variables
 dotenv.config();
@@ -39,16 +40,52 @@ app.get('/health', (req: Request, res: Response) => {
 // API Routes
 // Public routes
 app.use('/api/v1/auth', authRouter);
+// Users routes (all require admin)
+app.use('/api/v1/users', usersRouter);
 
 // Protected routes (require authentication)
-app.use('/api/v1/orders', authenticateToken, ordersRouter);
-app.use('/api/v1/activities', authenticateToken, activitiesRouter);
-app.use('/api/v1/subactivities', authenticateToken, subactivitiesRouter);
-app.use('/api/v1/deliverables', authenticateToken, deliverablesRouter);
-app.use('/api/v1/deliverable-assignments', authenticateToken, deliverableAssignmentsRouter);
-app.use('/api/v1/profiles', authenticateToken, profilesRouter);
-app.use('/api/v1/assignments', authenticateToken, assignmentsRouter);
-app.use('/api/v1/expert-pool', authenticateToken, expertPoolRouter);
+// Read-only routes (GET)
+app.get('/api/v1/orders', authenticateToken, ordersRouter);
+app.get('/api/v1/activities', authenticateToken, activitiesRouter);
+app.get('/api/v1/subactivities', authenticateToken, subactivitiesRouter);
+app.get('/api/v1/deliverables', authenticateToken, deliverablesRouter);
+app.get('/api/v1/deliverable-assignments', authenticateToken, deliverableAssignmentsRouter);
+app.get('/api/v1/profiles', authenticateToken, profilesRouter);
+app.get('/api/v1/assignments', authenticateToken, assignmentsRouter);
+app.get('/api/v1/expert-pool', authenticateToken, expertPoolRouter);
+
+// Write routes (require WRITE permission: ADMIN or USER)
+app.post('/api/v1/orders', authenticateToken, requireWrite, ordersRouter);
+app.put('/api/v1/orders/:id', authenticateToken, requireWrite, ordersRouter);
+app.delete('/api/v1/orders/:id', authenticateToken, requireWrite, ordersRouter);
+
+app.post('/api/v1/activities', authenticateToken, requireWrite, activitiesRouter);
+app.put('/api/v1/activities/:id', authenticateToken, requireWrite, activitiesRouter);
+app.delete('/api/v1/activities/:id', authenticateToken, requireWrite, activitiesRouter);
+
+app.post('/api/v1/subactivities', authenticateToken, requireWrite, subactivitiesRouter);
+app.put('/api/v1/subactivities/:id', authenticateToken, requireWrite, subactivitiesRouter);
+app.delete('/api/v1/subactivities/:id', authenticateToken, requireWrite, subactivitiesRouter);
+
+app.post('/api/v1/deliverables', authenticateToken, requireWrite, deliverablesRouter);
+app.put('/api/v1/deliverables/:id', authenticateToken, requireWrite, deliverablesRouter);
+app.delete('/api/v1/deliverables/:id', authenticateToken, requireWrite, deliverablesRouter);
+
+app.post('/api/v1/deliverable-assignments', authenticateToken, requireWrite, deliverableAssignmentsRouter);
+app.put('/api/v1/deliverable-assignments/:id', authenticateToken, requireWrite, deliverableAssignmentsRouter);
+app.delete('/api/v1/deliverable-assignments/:id', authenticateToken, requireWrite, deliverableAssignmentsRouter);
+
+app.post('/api/v1/profiles', authenticateToken, requireWrite, profilesRouter);
+app.put('/api/v1/profiles/:id', authenticateToken, requireWrite, profilesRouter);
+app.delete('/api/v1/profiles/:id', authenticateToken, requireWrite, profilesRouter);
+
+app.post('/api/v1/assignments', authenticateToken, requireWrite, assignmentsRouter);
+app.put('/api/v1/assignments/:id', authenticateToken, requireWrite, assignmentsRouter);
+app.delete('/api/v1/assignments/:id', authenticateToken, requireWrite, assignmentsRouter);
+
+app.post('/api/v1/expert-pool', authenticateToken, requireWrite, expertPoolRouter);
+app.put('/api/v1/expert-pool/:id', authenticateToken, requireWrite, expertPoolRouter);
+app.delete('/api/v1/expert-pool/:id', authenticateToken, requireWrite, expertPoolRouter);
 
 // API info endpoint
 app.get('/api/v1', (req: Request, res: Response) => {

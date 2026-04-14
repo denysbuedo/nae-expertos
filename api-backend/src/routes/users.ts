@@ -1,77 +1,58 @@
 import { Router, Request, Response } from 'express';
-import prisma from '@/lib/database';
+import { PrismaClient, UserRole } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import { authenticateToken, requireWrite, requireAdmin } from '../middleware/auth';
 
 const router = Router();
+const prisma = new PrismaClient();
 
-// Validation schemas
 const createUserSchema = z.object({
-  email: z.string().email(),
-  name: z.string().optional(),
-  password: z.string().min(8),
+  username: z.string().min(3),
+  password: z.string().min(6),
+  role: z.enum(['ADMIN', 'USER', 'VIEWER']).default('VIEWER'),
 });
 
-const updateUserSchema = z.object({
-  email: z.string().email().optional(),
-  name: z.string().optional(),
-});
-
-// GET /api/v1/users - Get all users
-router.get('/', async (req: Request, res: Response) => {
+// Get all users (admin only)
+router.get('/', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
+        updatedAt: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { username: 'asc' },
     });
-
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch users' });
+    res.status(500).json({ error: 'Error fetching users' });
   }
 });
 
-// GET /api/v1/users/:id - Get user by ID
-router.get('/:id', async (req: Request, res: Response) => {
+// Create user (admin only)
+router.post('/', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-      },
-    });
+    const { username, password, role } = createUserSchema.parse(req.body);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (existing) {
+      return res.status(409).json({ error: 'El usuario ya existe' });
     }
 
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch user' });
-  }
-});
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-// POST /api/v1/users - Create user
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const validatedData = createUserSchema.parse(req.body);
-
-    // TODO: Hash password before saving
     const user = await prisma.user.create({
-      data: validatedData,
+      data: {
+        username,
+        password: hashedPassword,
+        role: role as UserRole,
+      },
       select: {
         id: true,
-        email: true,
-        name: true,
+        username: true,
         role: true,
         createdAt: true,
       },
@@ -80,48 +61,71 @@ router.post('/', async (req: Request, res: Response) => {
     res.status(201).json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Validation failed', details: error.errors });
+      return res.status(400).json({ error: error.errors });
     }
-    res.status(500).json({ error: 'Failed to create user' });
+    res.status(500).json({ error: 'Error creating user' });
   }
 });
 
-// PATCH /api/v1/users/:id - Update user
-router.patch('/:id', async (req: Request, res: Response) => {
+// Update user (admin only)
+router.put('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
-    const validatedData = updateUserSchema.parse(req.body);
+    const { id } = req.params;
+    const { password, role } = req.body;
+
+    const updateData: any = {};
+    if (role) {
+      if (!['ADMIN', 'USER', 'VIEWER'].includes(role)) {
+        return res.status(400).json({ error: 'Rol inválido' });
+      }
+      updateData.role = role as UserRole;
+    }
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+      }
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'No hay datos para actualizar' });
+    }
 
     const user = await prisma.user.update({
-      where: { id: req.params.id },
-      data: validatedData,
+      where: { id },
+      data: updateData,
       select: {
         id: true,
-        email: true,
-        name: true,
+        username: true,
         role: true,
+        createdAt: true,
         updatedAt: true,
       },
     });
 
     res.json(user);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Validation failed', details: error.errors });
-    }
-    res.status(404).json({ error: 'User not found' });
+    res.status(500).json({ error: 'Error updating user' });
   }
 });
 
-// DELETE /api/v1/users/:id - Delete user
-router.delete('/:id', async (req: Request, res: Response) => {
+// Delete user (admin only)
+router.delete('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+
+    // Prevent self-deletion
+    if ((req as any).user?.userId === id) {
+      return res.status(400).json({ error: 'No puedes eliminar tu propio usuario' });
+    }
+
     await prisma.user.delete({
-      where: { id: req.params.id },
+      where: { id },
     });
 
     res.status(204).send();
   } catch (error) {
-    res.status(404).json({ error: 'User not found' });
+    res.status(500).json({ error: 'Error deleting user' });
   }
 });
 

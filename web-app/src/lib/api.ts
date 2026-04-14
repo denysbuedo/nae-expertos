@@ -31,6 +31,14 @@ api.interceptors.response.use(
 );
 
 // Types
+export interface SystemUser {
+  id: string;
+  username: string;
+  role: 'ADMIN' | 'USER' | 'VIEWER';
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Order {
   id: string;
   number: string;
@@ -193,6 +201,13 @@ export const expertPoolApi = {
   create: (data: Partial<ExpertPoolEntry>) => api.post<ExpertPoolEntry>('/expert-pool', data),
   update: (id: string, data: Partial<ExpertPoolEntry>) => api.put<ExpertPoolEntry>(`/expert-pool/${id}`, data),
   delete: (id: string) => api.delete(`/expert-pool/${id}`),
+};
+
+export const usersApi = {
+  getAll: () => api.get<SystemUser[]>('/users'),
+  create: (data: { username: string; password: string; role: string }) => api.post<SystemUser>('/users', data),
+  update: (id: string, data: { password?: string; role?: string }) => api.put<SystemUser>(`/users/${id}`, data),
+  delete: (id: string) => api.delete(`/users/${id}`),
 };
 
 export default api;

@@ -47,6 +47,9 @@ export default function AppContent({ children }: { children: React.ReactNode }) 
                 <a href="/profiles" className="text-slate-300 hover:text-white">Perfiles</a>
                 <a href="/expert-pool" className="text-slate-300 hover:text-white">Bolsa de Expertos</a>
                 <a href="/reports" className="text-slate-300 hover:text-white">Reportes</a>
+                {user?.role === 'ADMIN' && (
+                  <a href="/users" className="text-slate-300 hover:text-white">Usuarios</a>
+                )}
               </nav>
               {isAuthenticated && user && (
                 <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-slate-600">

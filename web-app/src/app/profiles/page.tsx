@@ -13,6 +13,7 @@ export default function ProfilesPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    type: 'nacional' as 'nacional' | 'internacional',
   });
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function ProfilesPage() {
 
   const openCreate = () => {
     setEditingProfile(null);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', type: 'nacional' });
     setShowModal(true);
   };
 
@@ -42,6 +43,7 @@ export default function ProfilesPage() {
     setFormData({
       name: profile.name,
       description: profile.description || '',
+      type: profile.type || 'nacional',
     });
     setShowModal(true);
   };
@@ -55,7 +57,7 @@ export default function ProfilesPage() {
         await profilesApi.create(formData);
       }
       setShowModal(false);
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '', description: '', type: 'nacional' });
       setEditingProfile(null);
       loadProfiles();
     } catch (error) {
@@ -118,7 +120,12 @@ export default function ProfilesPage() {
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900">{profile.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-semibold text-gray-900">{profile.name}</h3>
+                      <span className={`px-2 py-0.5 text-[10px] uppercase font-bold rounded-full ${profile.type === 'internacional' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {profile.type || 'nacional'}
+                      </span>
+                    </div>
                     {profile.description && (
                       <p className="text-sm text-gray-600 mt-1">{profile.description}</p>
                     )}
@@ -176,6 +183,17 @@ export default function ProfilesPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Ej: Ingeniero Agrónomo, Economista..."
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Perfil</label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'nacional' | 'internacional' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="nacional">Nacional</option>
+                    <option value="internacional">Internacional</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>

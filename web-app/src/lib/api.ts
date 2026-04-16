@@ -89,6 +89,7 @@ export interface Deliverable {
   createdAt: string;
   updatedAt: string;
   assignments?: DeliverableAssignment[];
+  subActivity?: SubActivity;
 }
 
 export interface DeliverableAssignment {
@@ -106,8 +107,11 @@ export interface Profile {
   id: string;
   name: string;
   description?: string;
+  type: 'nacional' | 'internacional';
   createdAt: string;
   updatedAt: string;
+  expertPoolProfiles?: Array<{ expert: ExpertPoolEntry }>;
+  _count?: { expertPoolProfiles: number };
 }
 
 export interface Assignment {
@@ -125,8 +129,9 @@ export interface ExpertPoolEntry {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   institution: string;
-  profileIds?: string[]; /// Para crear/actualizar
+  profileIds?: string[];
   profiles?: Array<{ id: string; profileId: string; profile: Profile }>;
   notes?: string;
   active: boolean;

@@ -57,7 +57,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create expert pool entry
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email, institution, profileIds, notes, active } = req.body;
+    const { firstName, lastName, email, phone, institution, profileIds, notes, active } = req.body;
 
     if (!profileIds || !Array.isArray(profileIds) || profileIds.length === 0) {
       return res.status(400).json({ error: 'Se requiere al menos un perfil (profileIds)' });
@@ -68,6 +68,7 @@ router.post('/', async (req: Request, res: Response) => {
         firstName,
         lastName,
         email,
+        phone,
         institution,
         notes,
         active: active !== undefined ? active : true,
@@ -99,7 +100,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { firstName, lastName, email, institution, profileIds, notes, active } = req.body;
+    const { firstName, lastName, email, phone, institution, profileIds, notes, active } = req.body;
 
     // Update the expert pool entry
     const entry = await prisma.expertPool.update({
@@ -108,6 +109,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         firstName,
         lastName,
         email,
+        phone,
         institution,
         notes,
         active,

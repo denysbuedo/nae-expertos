@@ -15,6 +15,7 @@ export default function ExpertPoolPage() {
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
     institution: '',
     profileIds: [] as string[],
     notes: '',
@@ -42,7 +43,7 @@ export default function ExpertPoolPage() {
 
   const openCreate = () => {
     setEditingEntry(null);
-    setFormData({ firstName: '', lastName: '', email: '', institution: '', profileIds: [], notes: '', active: true });
+    setFormData({ firstName: '', lastName: '', email: '', phone: '', institution: '', profileIds: [], notes: '', active: true });
     setShowModal(true);
   };
 
@@ -53,6 +54,7 @@ export default function ExpertPoolPage() {
       firstName: entry.firstName,
       lastName: entry.lastName,
       email: entry.email,
+      phone: entry.phone || '',
       institution: entry.institution,
       profileIds,
       notes: entry.notes || '',
@@ -81,7 +83,7 @@ export default function ExpertPoolPage() {
         await expertPoolApi.create(formData);
       }
       setShowModal(false);
-      setFormData({ firstName: '', lastName: '', email: '', institution: '', profileIds: [], notes: '', active: true });
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', institution: '', profileIds: [], notes: '', active: true });
       setEditingEntry(null);
       loadData();
     } catch (error: any) {
@@ -207,17 +209,23 @@ export default function ExpertPoolPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre (s)</label>
                     <input type="text" required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Apellidos</label>
                     <input type="text" required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                  <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono (opcional)</label>
+                    <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Institución</label>

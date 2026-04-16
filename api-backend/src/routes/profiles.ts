@@ -9,6 +9,16 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const profiles = await prisma.profile.findMany({
       orderBy: { name: 'asc' },
+      include: {
+        expertPoolProfiles: {
+          include: {
+            expert: true,
+          },
+        },
+        _count: {
+          select: { expertPoolProfiles: true }
+        }
+      }
     });
     
     res.json(profiles);
@@ -38,12 +48,13 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create profile
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, type } = req.body;
 
     const profile = await prisma.profile.create({
       data: {
         name,
         description,
+        type: type || 'nacional',
       },
     });
 
@@ -57,13 +68,14 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, type } = req.body;
 
     const profile = await prisma.profile.update({
       where: { id },
       data: {
         name,
         description,
+        type,
       },
     });
 

@@ -7,16 +7,16 @@ const prisma = new PrismaClient();
 // Get all assignments
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { profileId, subActivityId } = req.query;
+    const { expertPoolId, subActivityId } = req.query;
     
     const where: any = {};
-    if (profileId) where.profileId = profileId as string;
+    if (expertPoolId) where.expertPoolId = expertPoolId as string;
     if (subActivityId) where.subActivityId = subActivityId as string;
     
     const assignments = await prisma.assignment.findMany({
       where,
       include: {
-        profile: true,
+        expert: true,
         subActivity: {
           include: {
             activity: true,
@@ -39,7 +39,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     const assignment = await prisma.assignment.findUnique({
       where: { id },
       include: {
-        profile: true,
+        expert: true,
         subActivity: {
           include: {
             activity: true,
@@ -61,11 +61,11 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create assignment
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { profileId, subActivityId, role } = req.body;
+    const { expertPoolId, subActivityId, role } = req.body;
 
     const assignment = await prisma.assignment.create({
       data: {
-        profileId,
+        expertPoolId,
         subActivityId,
         role,
       },

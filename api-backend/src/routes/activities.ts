@@ -39,7 +39,7 @@ router.get('/:id', async (req: Request, res: Response) => {
             deliverables: true,
             assignments: {
               include: {
-                profile: true,
+                expert: true,
               },
             },
           },

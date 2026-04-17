@@ -25,6 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     res.json(expertPool);
   } catch (error) {
+    console.error('Error in GET /expert-pool:', error);
     res.status(500).json({ error: 'Error fetching expert pool entries' });
   }
 });
@@ -50,6 +51,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json(entry);
   } catch (error) {
+    console.error('Error in GET /expert-pool/:id:', error);
     res.status(500).json({ error: 'Error fetching expert pool entry' });
   }
 });
@@ -89,6 +91,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.status(201).json(entry);
   } catch (error: any) {
+    console.error('Error in POST /expert-pool:', error);
     if (error.code === 'P2002') {
       return res.status(409).json({ error: 'El correo ya está registrado' });
     }
@@ -148,6 +151,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     res.json(updatedEntry);
   } catch (error) {
+    console.error('Error in PUT /expert-pool/:id:', error);
     res.status(500).json({ error: 'Error updating expert pool entry' });
   }
 });
@@ -162,6 +166,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
+    console.error('Error in DELETE /expert-pool/:id:', error);
     res.status(500).json({ error: 'Error deleting expert pool entry' });
   }
 });

@@ -23,6 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
     
     res.json(profiles);
   } catch (error) {
+    console.error('Error in GET /profiles:', error);
     res.status(500).json({ error: 'Error fetching profiles' });
   }
 });
@@ -41,6 +42,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json(profile);
   } catch (error) {
+    console.error('Error in GET /profiles/:id:', error);
     res.status(500).json({ error: 'Error fetching profile' });
   }
 });
@@ -60,6 +62,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.status(201).json(profile);
   } catch (error) {
+    console.error('Error in POST /profiles:', error);
     res.status(500).json({ error: 'Error creating profile' });
   }
 });
@@ -81,6 +84,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     res.json(profile);
   } catch (error) {
+    console.error('Error in PUT /profiles/:id:', error);
     res.status(500).json({ error: 'Error updating profile' });
   }
 });
@@ -95,6 +99,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error) {
+    console.error('Error in DELETE /profiles/:id:', error);
     res.status(500).json({ error: 'Error deleting profile' });
   }
 });

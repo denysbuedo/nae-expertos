@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
         deliverables: true,
         assignments: {
           include: {
-            profile: true,
+            expert: true,
           },
         },
       },
@@ -41,12 +41,16 @@ router.get('/:id', async (req: Request, res: Response) => {
         activity: true,
         deliverables: {
           include: {
-            responsible: true,
+            assignments: {
+              include: {
+                expert: true,
+              },
+            },
           },
         },
         assignments: {
           include: {
-            profile: true,
+            expert: true,
           },
         },
       },

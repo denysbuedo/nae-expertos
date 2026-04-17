@@ -190,28 +190,79 @@ sudo certbot --nginx -d sistema.tudominio.com -d api.tudominio.com
 
 ---
 
-## 🔄 Fase 5: Protocolo de Actualizaciones (Despliegues Manuales)
+## 🔄 Fase 5: Protocolo de Actualizaciones (Despliegues Manuales con Optimizaciones Locales)
 
-Cuando exista una nueva versión (nuevo código implementado y mezclado en `main`), se recomienda ejecutar:
+En producción, es común mantener configuraciones u optimizaciones locales (como ajustes de PM2, proxies, o tuning de conexión) que no están subidas en el repositorio principal. Al realizar un despliegue con nuevos cambios, es vital conservar estas modificaciones.
 
-**Para actualizar Componente Backend API:**
+Sigue estos pasos para realizar una actualización segura en el servidor:
+
+### 1. Guardar optimizaciones locales
+Antes de traer los cambios nuevos del repositorio, guarda temporalmente tus modificaciones en el servidor utilizando un `stash`:
 ```bash
-cd ~/expertos-nae/api-backend
-git pull origin main
-npm install
-npm run db:generate
-npm run db:migrate
-# npm run build # si aplica
-pm2 restart nae-api
+cd /opt/nae-expertos # o la ruta donde tengas clonado el proyecto
+git stash
 ```
 
-**Para actualizar Componente Frontend:**
+### 2. Traer los nuevos cambios del repositorio
 ```bash
-cd ~/expertos-nae/web-app
 git pull origin main
-npm install
+```
+
+### 3. Reaplicar las optimizaciones locales
+Intenta aplicar los cambios guardados previamente sin alterar el estado de la rama actual:
+```bash
+git stash show -p stash@{0} | git apply
+```
+
+**Manejo de conflictos:**
+Si el comando anterior falla (por ejemplo: `error: patch failed...`), significa que los archivos del repositorio entraron en conflicto con tus optimizaciones. En este caso:
+1. Revisa qué archivos estaban en tu stash: `git stash show -p stash@{0} | grep -A2 "^diff --git"`
+2. Aplica los cambios **únicamente** a los archivos sin conflictos:
+   ```bash
+   git stash show -p stash@{0} | git apply --include='api-backend/src/lib/database.ts'
+   ```
+3. Para los archivos con conflictos, revisa la versión del nuevo repositorio (es probable que ya no necesiten el parche o debas arreglarlo manualmente).
+
+### 4. Re-construir los proyectos (Build)
+Con los cambios y optimizaciones integrados, procede a compilar:
+
+**Backend:**
+```bash
+cd /opt/nae-expertos/api-backend
+npm install            # Sólo si hay nuevas dependencias en el package.json
+# npm run db:generate  # Descomentar si hubo cambios en los modelos de Prisma
 npm run build
-pm2 restart nae-frontend
+```
+
+**Frontend:**
+```bash
+cd /opt/nae-expertos/web-app
+npm install            # Sólo si hay nuevas dependencias
+npm run build
+```
+
+### 5. Reiniciar y recargar servicios
+Una vez exitosos los builds, usa PM2 para reiniciar todo aplicando variables de entorno actualizadas:
+```bash
+cd /opt/nae-expertos
+pm2 restart all --update-env
+```
+*Opcional: Espera unos segundos y verifica el estado con `pm2 status`.*
+
+### 6. Verificación (Health Check)
+Comprueba que los servicios estén vivos (las rutas variarán acorde a los puertos finales o el reverse proxy Nginx):
+```bash
+# Validar salud de la API
+curl -s http://localhost:3001/health
+
+# Validar login u otro componente (por puerto o dominio final)
+curl -s -X POST http://localhost:3001/api/v1/auth/login -H "Content-Type: application/json" -d '{"username":"admin","password":"password"}'
+```
+
+### 7. Limpieza del Stash
+Una vez operando ambos servicios correctamente, descarta el stash guardado para evitar acumular historial local:
+```bash
+git stash drop stash@{0}
 ```
 
 ---

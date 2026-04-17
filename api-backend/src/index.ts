@@ -43,49 +43,29 @@ app.use('/api/v1/auth', authRouter);
 // Users routes (all require admin)
 app.use('/api/v1/users', usersRouter);
 
-// Protected routes (require authentication)
-// Read-only routes (GET)
-app.get('/api/v1/orders', authenticateToken, ordersRouter);
-app.get('/api/v1/activities', authenticateToken, activitiesRouter);
-app.get('/api/v1/subactivities', authenticateToken, subactivitiesRouter);
-app.get('/api/v1/deliverables', authenticateToken, deliverablesRouter);
-app.get('/api/v1/deliverable-assignments', authenticateToken, deliverableAssignmentsRouter);
-app.get('/api/v1/profiles', authenticateToken, profilesRouter);
-app.get('/api/v1/assignments', authenticateToken, assignmentsRouter);
-app.get('/api/v1/expert-pool', authenticateToken, expertPoolRouter);
+// Write permission middleware for mutable routes
+const ensureWritePermissions = (req: Request, res: Response, next: NextFunction) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    return requireWrite(req as any, res, next);
+  }
+  next();
+};
 
-// Write routes (require WRITE permission: ADMIN or USER)
-app.post('/api/v1/orders', authenticateToken, requireWrite, ordersRouter);
-app.put('/api/v1/orders/:id', authenticateToken, requireWrite, ordersRouter);
-app.delete('/api/v1/orders/:id', authenticateToken, requireWrite, ordersRouter);
+// Protected routes (require authentication + correct router mounting)
+const protectedRoutes = [
+  { path: '/api/v1/orders', router: ordersRouter },
+  { path: '/api/v1/activities', router: activitiesRouter },
+  { path: '/api/v1/subactivities', router: subactivitiesRouter },
+  { path: '/api/v1/deliverables', router: deliverablesRouter },
+  { path: '/api/v1/deliverable-assignments', router: deliverableAssignmentsRouter },
+  { path: '/api/v1/profiles', router: profilesRouter },
+  { path: '/api/v1/assignments', router: assignmentsRouter },
+  { path: '/api/v1/expert-pool', router: expertPoolRouter }
+];
 
-app.post('/api/v1/activities', authenticateToken, requireWrite, activitiesRouter);
-app.put('/api/v1/activities/:id', authenticateToken, requireWrite, activitiesRouter);
-app.delete('/api/v1/activities/:id', authenticateToken, requireWrite, activitiesRouter);
-
-app.post('/api/v1/subactivities', authenticateToken, requireWrite, subactivitiesRouter);
-app.put('/api/v1/subactivities/:id', authenticateToken, requireWrite, subactivitiesRouter);
-app.delete('/api/v1/subactivities/:id', authenticateToken, requireWrite, subactivitiesRouter);
-
-app.post('/api/v1/deliverables', authenticateToken, requireWrite, deliverablesRouter);
-app.put('/api/v1/deliverables/:id', authenticateToken, requireWrite, deliverablesRouter);
-app.delete('/api/v1/deliverables/:id', authenticateToken, requireWrite, deliverablesRouter);
-
-app.post('/api/v1/deliverable-assignments', authenticateToken, requireWrite, deliverableAssignmentsRouter);
-app.put('/api/v1/deliverable-assignments/:id', authenticateToken, requireWrite, deliverableAssignmentsRouter);
-app.delete('/api/v1/deliverable-assignments/:id', authenticateToken, requireWrite, deliverableAssignmentsRouter);
-
-app.post('/api/v1/profiles', authenticateToken, requireWrite, profilesRouter);
-app.put('/api/v1/profiles/:id', authenticateToken, requireWrite, profilesRouter);
-app.delete('/api/v1/profiles/:id', authenticateToken, requireWrite, profilesRouter);
-
-app.post('/api/v1/assignments', authenticateToken, requireWrite, assignmentsRouter);
-app.put('/api/v1/assignments/:id', authenticateToken, requireWrite, assignmentsRouter);
-app.delete('/api/v1/assignments/:id', authenticateToken, requireWrite, assignmentsRouter);
-
-app.post('/api/v1/expert-pool', authenticateToken, requireWrite, expertPoolRouter);
-app.put('/api/v1/expert-pool/:id', authenticateToken, requireWrite, expertPoolRouter);
-app.delete('/api/v1/expert-pool/:id', authenticateToken, requireWrite, expertPoolRouter);
+protectedRoutes.forEach(({ path, router }) => {
+  app.use(path, authenticateToken, ensureWritePermissions, router);
+});
 
 // API info endpoint
 app.get('/api/v1', (req: Request, res: Response) => {
